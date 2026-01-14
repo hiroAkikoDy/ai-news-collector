@@ -1,5 +1,10 @@
 # AI News Collector - Twitter Tweet Collector
 
+[![GitHub](https://img.shields.io/badge/GitHub-hiroAkikoDy%2Fai--news--collector-blue?logo=github)](https://github.com/hiroAkikoDy/ai-news-collector)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python)](https://www.python.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green?logo=node.js)](https://nodejs.org/)
+
 Twitter (X) から最新ツイートを収集し、含まれるURLのコンテンツを自動取得するシステムです。
 
 ## 機能
