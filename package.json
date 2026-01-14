@@ -1,0 +1,30 @@
+{
+  "name": "ai-news-collector",
+  "version": "1.0.0",
+  "description": "Twitter news collector with Chrome extension and backend",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "demo": "node demo/collect-demo.js",
+    "report": "python scripts/generate_report.py",
+    "neo4j": "python scripts/save_to_neo4j.py",
+    "scheduler": "python scripts/news_scheduler.py",
+    "scheduler:test": "python scripts/news_scheduler.py --test"
+  },
+  "keywords": [
+    "twitter",
+    "news",
+    "collector",
+    "chrome-extension"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.22.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

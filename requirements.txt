@@ -1,0 +1,14 @@
+# AI News Collector - Python Dependencies
+
+# Anthropic Claude API
+anthropic>=0.40.0
+
+# Neo4j Database
+neo4j>=5.0.0
+
+# Task Scheduling
+schedule>=1.2.0
+
+# Optional: For advanced analysis
+# openai>=1.0.0
+# langchain>=0.1.0
