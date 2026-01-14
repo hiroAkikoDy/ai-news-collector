@@ -144,8 +144,8 @@ npm run demo
 1. Chrome拡張のアイコンをクリック
 
 2. "Account Settings" セクションで情報を入力:
-   - **X Account**: `@Hiro2May`
-   - **Google Account**: `red1208ram@gmail.com`
+   - **X Account**: `@YourUsername`
+   - **Google Account**: `your-email@gmail.com`
 
 3. 「Save Settings」ボタンをクリック
 
@@ -153,7 +153,7 @@ npm run demo
 
 1. **Xにログイン**
    - https://x.com にアクセス
-   - 設定したGoogleアカウント（red1208ram@gmail.com）でログイン
+   - あなたのアカウントでログイン
 
 2. **タイムラインを開く**
    - https://x.com/home にアクセス
@@ -166,7 +166,7 @@ npm run demo
 
 4. **データ確認**
    - 「View Saved Data」ボタンで保存されたデータを確認
-   - ファイル名: `YYYYMMDD_Hiro2May.json`
+   - ファイル名: `YYYYMMDD_username.json`
 
 #### 特定アカウントのツイートを収集
 
@@ -246,13 +246,13 @@ npm run scheduler:test
 
 ```json
 {
-  "username": "Hiro2May",
+  "username": "your_username",
   "source": "home_timeline",
   "collectedAt": "2026-01-14T03:51:00.000Z",
   "tweetCount": 5,
   "tweets": [
     {
-      "author": "GOROman",
+      "author": "example_user",
       "text": "ツイート本文...",
       "timestamp": "2026-01-14T03:51:00.000Z",
       "urls": ["https://example.com/article"],

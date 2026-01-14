@@ -317,7 +317,7 @@ command = f'python "{self.scripts_dir / "generate_report.py"}"'
 1. chrome://extensions/ を開く
 2. デベロッパーモードON
 3. extension フォルダを読み込む
-4. アカウント設定（@Hiro2May, red1208ram@gmail.com）
+4. アカウント設定（あなたのXアカウントとGoogleアカウント）
 ```
 
 ### 2. APIキーの設定
