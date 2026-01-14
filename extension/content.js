@@ -62,18 +62,29 @@ function extractTweets(maxCount = 20) {
 
       // Extract URLs from the tweet
       const urls = [];
+      const tweetUrls = []; // Twitter/X status URLs (thread, reply)
+
       const linkElements = tweetEl.querySelectorAll('a[href*="http"]');
       linkElements.forEach(link => {
         const href = link.getAttribute('href');
-        // Filter out Twitter internal links
-        if (href && !href.includes('twitter.com') && !href.includes('x.com') && !href.includes('t.co')) {
+        if (!href) return;
+
+        // Check if it's a Twitter/X status link (thread or reply)
+        if (href.includes('/status/')) {
+          const fullUrl = href.startsWith('http') ? href : `https://x.com${href}`;
+          if (!tweetUrls.includes(fullUrl)) {
+            tweetUrls.push(fullUrl);
+          }
+        }
+        // External links (not Twitter/X)
+        else if (!href.includes('twitter.com') && !href.includes('x.com')) {
           if (!urls.includes(href)) {
             urls.push(href);
           }
         }
       });
 
-      // Also check for t.co links and extract them
+      // Also check for t.co links (shortened URLs)
       const tcoLinks = tweetEl.querySelectorAll('a[href*="t.co"]');
       tcoLinks.forEach(link => {
         const href = link.getAttribute('href');
@@ -87,6 +98,7 @@ function extractTweets(maxCount = 20) {
         text: tweetText,
         timestamp: timestamp,
         urls: urls,
+        tweetUrls: tweetUrls, // Thread/reply links
         index: i
       });
     } catch (error) {
