@@ -109,4 +109,45 @@ document.addEventListener('DOMContentLoaded', () => {
       statusDiv.textContent = 'Error loading data: ' + error.message;
     }
   });
+
+  // Download JSON button
+  downloadBtn.addEventListener('click', async () => {
+    statusDiv.textContent = 'Preparing download...';
+
+    try {
+      const data = await chrome.storage.local.get(null);
+      const keys = Object.keys(data).filter(k => k.includes('.json') || (data[k].tweets && Array.isArray(data[k].tweets)));
+
+      if (keys.length === 0) {
+        statusDiv.textContent = 'No data to download.';
+        return;
+      }
+
+      // Download each file
+      let downloadCount = 0;
+      for (const key of keys) {
+        const item = data[key];
+        const jsonStr = JSON.stringify(item, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        // Use chrome.downloads API to save file
+        await chrome.downloads.download({
+          url: url,
+          filename: `ai-news-collector/${key}`,
+          saveAs: false
+        });
+
+        downloadCount++;
+
+        // Clean up the blob URL
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      statusDiv.textContent = `Downloaded ${downloadCount} file(s) to Downloads/ai-news-collector/`;
+    } catch (error) {
+      console.error('Download error:', error);
+      statusDiv.textContent = 'Error downloading: ' + error.message;
+    }
+  });
 });
