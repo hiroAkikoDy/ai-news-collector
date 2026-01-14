@@ -1,6 +1,7 @@
 // Popup script for Twitter News Collector
 
 document.addEventListener('DOMContentLoaded', () => {
+  const autoScrollBtn = document.getElementById('autoScrollBtn');
   const collectBtn = document.getElementById('collectBtn');
   const viewDataBtn = document.getElementById('viewDataBtn');
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
@@ -59,10 +60,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Collect tweets button
+  // Auto-scroll and collect button
+  autoScrollBtn.addEventListener('click', async () => {
+    autoScrollBtn.disabled = true;
+    collectBtn.disabled = true;
+    statusDiv.textContent = 'Auto-scrolling and collecting tweets... This may take a minute.';
+
+    try {
+      // Get current tab
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      // Check if we're on Twitter/X
+      if (!tab.url.includes('twitter.com') && !tab.url.includes('x.com')) {
+        statusDiv.textContent = 'Error: Please navigate to a Twitter/X page first.';
+        autoScrollBtn.disabled = false;
+        collectBtn.disabled = false;
+        return;
+      }
+
+      // Send message to content script with autoScroll flag
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'collectTweets',
+        autoScroll: true
+      });
+
+      if (response && response.success) {
+        statusDiv.textContent = `Successfully auto-scrolled and collected ${response.tweets.length} tweets!`;
+      } else {
+        statusDiv.textContent = 'Error: ' + (response?.error || 'Unknown error');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      statusDiv.textContent = 'Error: ' + error.message;
+    } finally {
+      autoScrollBtn.disabled = false;
+      collectBtn.disabled = false;
+    }
+  });
+
+  // Collect tweets button (current view only)
   collectBtn.addEventListener('click', async () => {
     collectBtn.disabled = true;
-    statusDiv.textContent = 'Collecting tweets...';
+    autoScrollBtn.disabled = true;
+    statusDiv.textContent = 'Collecting tweets from current view...';
 
     try {
       // Get current tab
@@ -72,11 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!tab.url.includes('twitter.com') && !tab.url.includes('x.com')) {
         statusDiv.textContent = 'Error: Please navigate to a Twitter/X page first.';
         collectBtn.disabled = false;
+        autoScrollBtn.disabled = false;
         return;
       }
 
       // Send message to content script
-      const response = await chrome.tabs.sendMessage(tab.id, { action: 'collectTweets' });
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'collectTweets',
+        autoScroll: false
+      });
 
       if (response && response.success) {
         statusDiv.textContent = `Successfully collected ${response.tweets.length} tweets!`;
@@ -88,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
       statusDiv.textContent = 'Error: ' + error.message;
     } finally {
       collectBtn.disabled = false;
+      autoScrollBtn.disabled = false;
     }
   });
 

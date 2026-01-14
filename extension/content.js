@@ -109,8 +109,54 @@ function extractTweets(maxCount = 20) {
   return tweets;
 }
 
+// Auto-scroll function to load more tweets
+async function autoScrollToLoadTweets(targetCount, onProgress) {
+  console.log(`Auto-scrolling to load ${targetCount} tweets...`);
+
+  let lastHeight = 0;
+  let scrollAttempts = 0;
+  const maxScrollAttempts = 30; // Prevent infinite loops
+
+  while (scrollAttempts < maxScrollAttempts) {
+    const currentTweetCount = document.querySelectorAll('article[data-testid="tweet"]').length;
+
+    // Update progress
+    if (onProgress) {
+      onProgress(currentTweetCount, targetCount);
+    }
+
+    // Check if we have enough tweets
+    if (currentTweetCount >= targetCount) {
+      console.log(`Loaded ${currentTweetCount} tweets (target: ${targetCount})`);
+      break;
+    }
+
+    // Scroll to bottom
+    window.scrollTo(0, document.body.scrollHeight);
+
+    // Wait for new content to load
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Check if page height changed (new content loaded)
+    if (document.body.scrollHeight === lastHeight) {
+      console.log('No more content to load');
+      break;
+    }
+
+    lastHeight = document.body.scrollHeight;
+    scrollAttempts++;
+  }
+
+  // Scroll back to top
+  window.scrollTo(0, 0);
+
+  const finalCount = document.querySelectorAll('article[data-testid="tweet"]').length;
+  console.log(`Auto-scroll complete: ${finalCount} tweets loaded`);
+  return finalCount;
+}
+
 // Function to collect tweets and process URLs
-async function collectTweets(username = null) {
+async function collectTweets(username = null, autoScroll = false) {
   console.log('Starting tweet collection...');
 
   // Get user settings
@@ -119,6 +165,13 @@ async function collectTweets(username = null) {
     username = settings.xAccount || 'timeline';
   }
   const maxTweets = settings.tweetCount || 20;
+
+  // Auto-scroll if requested
+  if (autoScroll) {
+    await autoScrollToLoadTweets(maxTweets, (current, target) => {
+      console.log(`Loading tweets: ${current}/${target}`);
+    });
+  }
 
   // Extract tweets from DOM
   const tweets = extractTweets(maxTweets);
@@ -187,7 +240,8 @@ async function collectTweets(username = null) {
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'collectTweets') {
-    collectTweets()
+    const autoScroll = request.autoScroll || false;
+    collectTweets(null, autoScroll)
       .then(tweets => sendResponse({ success: true, tweets }))
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true; // Keep the message channel open
