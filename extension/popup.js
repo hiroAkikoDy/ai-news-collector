@@ -4,9 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const collectBtn = document.getElementById('collectBtn');
   const viewDataBtn = document.getElementById('viewDataBtn');
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
   const statusDiv = document.getElementById('status');
   const xAccountInput = document.getElementById('xAccount');
   const googleAccountInput = document.getElementById('googleAccount');
+  const tweetCountInput = document.getElementById('tweetCount');
   const currentAccountDiv = document.getElementById('currentAccount');
 
   // Load saved settings
@@ -15,13 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load settings function
   async function loadSettings() {
     try {
-      const settings = await chrome.storage.local.get(['xAccount', 'googleAccount']);
+      const settings = await chrome.storage.local.get(['xAccount', 'googleAccount', 'tweetCount']);
       if (settings.xAccount) {
         xAccountInput.value = settings.xAccount;
         currentAccountDiv.textContent = `Current: ${settings.xAccount}`;
       }
       if (settings.googleAccount) {
         googleAccountInput.value = settings.googleAccount;
+      }
+      if (settings.tweetCount) {
+        tweetCountInput.value = settings.tweetCount;
       }
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -32,14 +37,22 @@ document.addEventListener('DOMContentLoaded', () => {
   saveSettingsBtn.addEventListener('click', async () => {
     const xAccount = xAccountInput.value.trim();
     const googleAccount = googleAccountInput.value.trim();
+    const tweetCount = parseInt(tweetCountInput.value) || 20;
+
+    // Validate tweet count
+    if (tweetCount < 1 || tweetCount > 100) {
+      statusDiv.textContent = 'Tweet count must be between 1 and 100';
+      return;
+    }
 
     try {
       await chrome.storage.local.set({
         xAccount: xAccount,
-        googleAccount: googleAccount
+        googleAccount: googleAccount,
+        tweetCount: tweetCount
       });
 
-      currentAccountDiv.textContent = `Current: ${xAccount || 'Not set'}`;
+      currentAccountDiv.textContent = `Current: ${xAccount || 'Not set'} (${tweetCount} tweets)`;
       statusDiv.textContent = 'Settings saved successfully!';
     } catch (error) {
       statusDiv.textContent = 'Error saving settings: ' + error.message;

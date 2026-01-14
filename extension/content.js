@@ -113,15 +113,16 @@ function extractTweets(maxCount = 20) {
 async function collectTweets(username = null) {
   console.log('Starting tweet collection...');
 
-  // Get user settings if no username provided
+  // Get user settings
+  const settings = await chrome.storage.local.get(['xAccount', 'tweetCount']);
   if (!username) {
-    const settings = await chrome.storage.local.get(['xAccount']);
     username = settings.xAccount || 'timeline';
   }
+  const maxTweets = settings.tweetCount || 20;
 
   // Extract tweets from DOM
-  const tweets = extractTweets(20);
-  console.log(`Extracted ${tweets.length} tweets`);
+  const tweets = extractTweets(maxTweets);
+  console.log(`Extracted ${tweets.length} tweets (max: ${maxTweets})`);
 
   // Determine the collection source
   const currentUrl = window.location.href;
